@@ -7,8 +7,9 @@ def main():
 		csv_reader = csv.reader(csv_file, delimiter=',')
 		for row in csv_reader:
 			data.append(row)
-	data = np.array(data)
-	print(data.shape)
+	fields = data[0]
+	data = np.array(data[1:])
+	print(data.shape, fields)
 
 if __name__  == "__main__":
 	main()
