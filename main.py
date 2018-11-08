@@ -2,6 +2,7 @@ import csv
 import numpy as np
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.stem.porter import PorterStemmer
 
 def textFilter(tokenizedText):
 
@@ -16,6 +17,7 @@ def textFilter(tokenizedText):
 			if(word == 'comma'):
 				filteredText.append(',')
 			else:
+				word = str(PorterStemmer().stem(word))
 				filteredText.append(word)
 	
 	return filteredText
