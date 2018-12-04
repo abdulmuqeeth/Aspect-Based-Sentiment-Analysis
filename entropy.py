@@ -101,7 +101,9 @@ def WordsPOS(x):
 	return words
 
 def Emoticons(x):
-	pass
+	pos_emoticons = [':)', ': )', ':-)', ';)', ';-)', '=)', '^_^', ':-D', ':-d', ':d', ':D', '=d', '=D', 'C:', 'c:', 'xd', 'XD', 'Xd', 'xD', '(x', '(=', '^^', '^o^', '^O^', '\'u\'', 'n_n', '*_*', '*o*', '*O*', '*_*']
+	neg_emoticons = [':-(', ':(', ':((', ': (', 'd:', 'D:', 'Dx', 'n', ':|', '/:', ':\\', '):-/', ':', '=\'[', ':_(', '/T_T', '/t_t' , 'TOT', 'tot', ';_;' ]
+	return pos_emoticons + neg_emoticons
 
 def ch_n_gram(x):
 	pass
