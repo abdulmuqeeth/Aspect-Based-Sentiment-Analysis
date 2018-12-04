@@ -13,6 +13,7 @@ from nltk.stem.porter import PorterStemmer
 from sklearn.metrics import *
 from nltk import MaxentClassifier
 from sklearn.feature_extraction.text import TfidfVectorizer
+nltk.download('averaged_perceptron_tagger')
 # nltk.download()
 
 def textFilter(tokenizedText):
@@ -43,7 +44,7 @@ def filterData(allData):
 	
 	return filteredData
 
-def bagOfWords(filteredData):
+def BagOfWords(filteredData):
 	bow = []
 	for i in range(len(filteredData)):
 		words = filteredData[i][1]
@@ -58,7 +59,7 @@ def bagOfWords(filteredData):
 	return bow
 
 def WordsAroundVerb(x):
-	pass
+	return []
 
 def BeginningWords(x):
 	words = []
@@ -88,19 +89,19 @@ def SkipBigrams(x):
 	return all_skip_bigrams
 
 def HeadWords(x):
-	pass
+	return []
 
 def WordsPOS(x):
 	words = []
 	for sentence in x:
-		pos_tags = nltk.pos_tagger(sentence)
+		pos_tags = nltk.pos_tag(sentence)
 		for word in pos_tags:
 			# if re.compile('NN*').match(words[1]) is not None:
-			if words[1][0] == 'V' or words[1][0] == 'J' or words[1][0] == 'R'
+			if (words[1][0] == 'V' or words[1][0] == 'J' or words[1][0] == 'R'):
 				words.append(word[0])
 	return words
 
-def Emoticons(x):
+def Emoticons():
 	pos_emoticons = [':)', ': )', ':-)', ';)', ';-)', '=)', '^_^', ':-D', ':-d', ':d', ':D', '=d', '=D', 'C:', 'c:', 'xd', 'XD', 'Xd', 'xD', '(x', '(=', '^^', '^o^', '^O^', '\'u\'', 'n_n', '*_*', '*o*', '*O*', '*_*']
 	neg_emoticons = [':-(', ':(', ':((', ': (', 'd:', 'D:', 'Dx', 'n', ':|', '/:', ':\\', '):-/', ':', '=\'[', ':_(', '/T_T', '/t_t' , 'TOT', 'tot', ';_;' ]
 	return pos_emoticons + neg_emoticons
@@ -113,6 +114,42 @@ def VerbTags(x):
 
 def VerbWords(x):
 	pass
+
+def Feature_Vector(x, x_train_aspect):
+	features = []
+	features += WordsAroundVerb(x)
+	features += EndWords(x)
+	features += BeginningWords(x)
+	features += x_train_aspect
+	features += Bigrams(x)
+	features += HeadWords(x)
+	#features += BagOfWords()
+	features += WordsPOS(x)
+	features += Emoticons
+	features += ch_n_gram(x)
+	return features
+
+def dict(features, sentence):
+    feature_vec = {}
+    for feature in features:
+        if feature in sentence:
+            feature_vec[feature] = 1
+        else:
+            feature_vec[feature] = 0
+    return feature_vec
+
+def all_documents(format_data, format_labels):
+    all_docs = [(word_tokenize(format_data[i]), format_labels[i]) for i in range(len(format_data))]
+    return all_docs
+
+def train_data(tokens, data, labels):
+    all_docs = all_documents(data, labels)
+    training_data = []
+    for document in all_docs:
+        # Getting the training data into correct format for nltk.MaxEntClassifier.train
+        temp = tuple((dict(tokens, document), document[1]))
+        training_data.append(temp)
+    return training_data
 
 def main():
 	data = []
@@ -136,6 +173,12 @@ def main():
 
 	x_train = np.array(x_train)
 	y_train = np.array(y_train)
+
+
+
+	features = Feature_Vector(x_train, x_train_aspect)
+	print('printing features')
+	print(features)
 
 	# 10-Fold Cross Validation
 	kf = KFold(n_splits=10)
