@@ -182,6 +182,15 @@ def train_data(tokens, data, labels):
         training_data.append(temp)
     return training_data
 
+def test_data(tokens, data, labels):
+    all_docs = all_documents(data, labels)
+    testing_data = []
+    for document in all_docs:
+        # Getting the training data into correct format for nltk.MaxEntClassifier.train.classify
+        testing_data.append(dict(tokens, document))
+    return testing_data
+
+
 def main():
 	data = []
 	with open('data-1_train.csv') as csv_file:
@@ -225,17 +234,22 @@ def main():
 	kf.get_n_splits(x_train)
 
 	for train_index, test_index in kf.split(x_train):
+		errors = 0
 		x_train_kf, x_test_kf = x_train[train_index], x_train[test_index]
 		y_train_kf, y_test_kf = y_train[train_index], y_train[test_index]
+		x_train_aspect_kf = x_train_aspect[train_index]
 
-		vectorizer = TfidfVectorizer()
-		print(x_train_kf)
-		tfidf_x_train_kf = vectorizer.fit(x_train_kf)
+		fv = Feature_Vector(x,  x_train_aspect)
+		x_train_maxent = train_data(fv, x_train_kf, y_train_kf)
+		mec = MaxentClassifier.train(x_train_maxent)
 
-		print(vectorizer.get_feature_names())
+		x_test_maxent = test_data(fv, x_test_kf, y_test_kf)
 
-		mec_train_data = list(zip(onehot_xtrain_kf, y_train_kf))
-		mec = MaxentClassifier.train(mec_train_data)
+		for featureset, label in zip(x_test_maxent, y_test_kf):
+			if(mec.classify(featureset) != label):
+				errors += 1
+
+		print("Accuracy: %f"% (1 - (errors / float(len(y_test_kf)))))
 
 
 
