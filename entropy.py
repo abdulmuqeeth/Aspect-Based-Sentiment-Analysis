@@ -64,29 +64,57 @@ def WordsAroundVerb(x):
 def BeginningWords(x):
 	words = []
 	for sentence in x:
-		words.append(sentence[:5])
+		if(len(sentence)>=5):
+			words.append(sentence[0])
+			words.append(sentence[1])
+			words.append(sentence[2])
+			words.append(sentence[3])
+			words.append(sentence[4])
+		else:
+			for i in range(len(sentence)):
+				words.append(sentence[i])
 	return words
 
 def EndWords(x):
 	words = []
 	for sentence in x:
-		words.append(sentence[5:])
+
+		if(len(sentence)>=5):
+			words.append(sentence[-5])
+			words.append(sentence[-4])
+			words.append(sentence[-3])
+			words.append(sentence[-2])
+			words.append(sentence[-1])
+		else:
+			for i in range(len(sentence)):
+				words.append(sentence[i])
 	return words
 
 def Bigrams(x):
 	all_bigrams = []
+	final_list = []
 	for sentence in x:
+		print(nltk.bigrams(sentence))
 		all_bigrams.append(list(nltk.bigrams(sentence)))
-	return all_bigrams
+
+	for bigram_sentence in all_bigrams:
+		for tupl in bigram_sentence:
+			final_list.append(tupl[0]+' '+tupl[1])
+
+	print(final_list[0])
+	return final_list
 
 def SkipBigrams(x):
 	all_skip_bigrams = []
+	final_list = []
 	for sentence in x:
-		all_skip_bigrams.append(nltk.util.skipgrams(sentence, 2, 2))
-		all_skip_bigrams.append(nltk.util.skipgrams(sentence, 2, 3))
-		all_skip_bigrams.append(nltk.util.skipgrams(sentence, 2, 4))
-		all_skip_bigrams.append(nltk.util.skipgrams(sentence, 2, 5))
-	return all_skip_bigrams
+		all_skip_bigrams.append(nltk.skipgrams(sentence, 2, 5))
+
+	for skipgram_sentence in all_skip_bigrams:
+		for tupl in skipgram_sentence:
+			final_list.append(tupl[0]+' '+tupl[1])
+
+	return final_list
 
 def HeadWords(x):
 	return []
@@ -95,9 +123,11 @@ def WordsPOS(x):
 	words = []
 	for sentence in x:
 		pos_tags = nltk.pos_tag(sentence)
+		print('pos_tags', pos_tags)
 		for word in pos_tags:
+			print('word',word)
 			# if re.compile('NN*').match(words[1]) is not None:
-			if (words[1][0] == 'V' or words[1][0] == 'J' or words[1][0] == 'R'):
+			if (word[1][0] == 'V' or word[1][0] == 'J' or word[1][0] == 'R'):
 				words.append(word[0])
 	return words
 
@@ -107,7 +137,7 @@ def Emoticons():
 	return pos_emoticons + neg_emoticons
 
 def ch_n_gram(x):
-	pass
+	return []
 
 def VerbTags(x):
 	pass
@@ -115,18 +145,19 @@ def VerbTags(x):
 def VerbWords(x):
 	pass
 
-def Feature_Vector(x, x_train_aspect):
+def Features(x_train, x_train_aspect):
 	features = []
-	features += WordsAroundVerb(x)
-	features += EndWords(x)
-	features += BeginningWords(x)
+	features += WordsAroundVerb(x_train)
+	features += EndWords(x_train)
+	features += BeginningWords(x_train)
 	features += x_train_aspect
-	features += Bigrams(x)
-	features += HeadWords(x)
+	features += Bigrams(x_train)
+	features += SkipBigrams(x_train)
+	#features += HeadWords(x_train)
 	#features += BagOfWords()
-	features += WordsPOS(x)
-	features += Emoticons
-	features += ch_n_gram(x)
+	features += WordsPOS(x_train)
+	features += Emoticons()
+	#features += ch_n_gram(x_train)
 	return features
 
 def dict(features, sentence):
@@ -174,11 +205,20 @@ def main():
 	x_train = np.array(x_train)
 	y_train = np.array(y_train)
 
+	print('here')
+	print(x_train[0])
+	print('here')
+	print(y_train[0:10])
 
 
-	features = Feature_Vector(x_train, x_train_aspect)
+
+	features = Features(x_train, x_train_aspect)
 	print('printing features')
 	print(features)
+	print('Length: ',len(features), type(features))
+
+	features = set(features)
+	print('Length2: ',len(features))
 
 	# 10-Fold Cross Validation
 	kf = KFold(n_splits=10)
