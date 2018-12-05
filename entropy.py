@@ -116,6 +116,20 @@ def SkipBigrams(x):
 
 	return final_list
 
+def SkipBigramsSentence(x):
+	all_skip_bigrams = []
+	final_list = []
+	#print(x)
+	#print('xxx')
+	all_skip_bigrams.append(list(nltk.skipgrams(x, 2, 5)))
+	#print(all_skip_bigrams)
+	for tupl in all_skip_bigrams[0]:
+		#print('tuple')
+		#print(tupl)
+		final_list.append(tupl[0]+' '+tupl[1])
+
+	return final_list
+
 def HeadWords(x):
 	return []
 
@@ -123,9 +137,9 @@ def WordsPOS(x):
 	words = []
 	for sentence in x:
 		pos_tags = nltk.pos_tag(sentence)
-		print('pos_tags', pos_tags)
+		#print('pos_tags', pos_tags)
 		for word in pos_tags:
-			print('word',word)
+			#print('word',word)
 			# if re.compile('NN*').match(words[1]) is not None:
 			if (word[1][0] == 'V' or word[1][0] == 'J' or word[1][0] == 'R'):
 				words.append(word[0])
@@ -150,7 +164,7 @@ def Features(x_train, x_train_aspect):
 	features += WordsAroundVerb(x_train)
 	features += EndWords(x_train)
 	features += BeginningWords(x_train)
-	features += x_train_aspect
+	features += list(x_train_aspect)
 	features += Bigrams(x_train)
 	features += SkipBigrams(x_train)
 	#features += HeadWords(x_train)
@@ -161,34 +175,38 @@ def Features(x_train, x_train_aspect):
 	return features
 
 def dict(features, sentence):
-    feature_vec = {}
-    for feature in features:
-        if feature in sentence:
-            feature_vec[feature] = 1
-        else:
-            feature_vec[feature] = 0
-    return feature_vec
+	sentence += SkipBigramsSentence(sentence)
+	feature_vec = {}
+	for feature in features:
+		if feature in sentence:
+			feature_vec[feature] = 1
+		else:
+			feature_vec[feature] = 0
+	#print(feature_vec)
+	#print(sum(feature_vec.values()))
+	#print('in dict')
+	return feature_vec
 
 def all_documents(format_data, format_labels):
-    all_docs = [(word_tokenize(format_data[i]), format_labels[i]) for i in range(len(format_data))]
-    return all_docs
+	all_docs = [(format_data[i], format_labels[i]) for i in range(len(format_data))]
+	return all_docs
 
 def train_data(tokens, data, labels):
-    all_docs = all_documents(data, labels)
-    training_data = []
-    for document in all_docs:
-        # Getting the training data into correct format for nltk.MaxEntClassifier.train
-        temp = tuple((dict(tokens, document), document[1]))
-        training_data.append(temp)
-    return training_data
+	all_docs = all_documents(data, labels)
+	training_data = []
+	for document in all_docs:
+		# Getting the training data into correct format for nltk.MaxEntClassifier.train
+		temp = tuple((dict(tokens, document[0]), document[1]))
+		training_data.append(temp)
+	return training_data
 
 def test_data(tokens, data, labels):
-    all_docs = all_documents(data, labels)
-    testing_data = []
-    for document in all_docs:
-        # Getting the training data into correct format for nltk.MaxEntClassifier.train.classify
-        testing_data.append(dict(tokens, document))
-    return testing_data
+	all_docs = all_documents(data, labels)
+	testing_data = []
+	for document in all_docs:
+		# Getting the training data into correct format for nltk.MaxEntClassifier.train.classify
+		testing_data.append(dict(tokens, document[0]))
+	return testing_data
 
 
 def main():
@@ -213,6 +231,7 @@ def main():
 
 	x_train = np.array(x_train)
 	y_train = np.array(y_train)
+	x_train_aspect = np.array(x_train_aspect)
 
 	print('here')
 	print(x_train[0])
@@ -234,16 +253,25 @@ def main():
 	kf.get_n_splits(x_train)
 
 	for train_index, test_index in kf.split(x_train):
+		print(type(train_index))
+		print(type(x_train))
 		errors = 0
 		x_train_kf, x_test_kf = x_train[train_index], x_train[test_index]
 		y_train_kf, y_test_kf = y_train[train_index], y_train[test_index]
+		print(type(x_train_aspect))
 		x_train_aspect_kf = x_train_aspect[train_index]
 
-		fv = Feature_Vector(x,  x_train_aspect)
+		fv = Features(x_train_kf,  x_train_aspect_kf)
 		x_train_maxent = train_data(fv, x_train_kf, y_train_kf)
-		mec = MaxentClassifier.train(x_train_maxent)
-
+		print('Train feature vectors created')
+		
 		x_test_maxent = test_data(fv, x_test_kf, y_test_kf)
+		print('Test feature vectors created')
+		
+		mec = MaxentClassifier.train(x_train_maxent)
+		print('train finish')
+
+		
 
 		for featureset, label in zip(x_test_maxent, y_test_kf):
 			if(mec.classify(featureset) != label):
