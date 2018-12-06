@@ -73,6 +73,8 @@ def textFilter(tokenizedText):
 			
 			filteredText.append(word)
 
+	bigrams =[]
+	trigrams =[]
 	bigrams = SkipBigrams(filteredText)
 	trigrams = SkipTrigrams(filteredText)
 	filteredText = filteredText + bigrams + trigrams
@@ -206,12 +208,13 @@ def main():
 	global a
 	global b
 	data = []
-	with open('data-2_train.csv') as csv_file:
+	with open('data-1_train.csv') as csv_file:
 		csv_reader = csv.reader(csv_file, delimiter=',')
 		for row in csv_reader:
 			data.append(row)
 	fields = data[0]
 	data = np.array(data[1:], dtype=object)
+	np.random.shuffle(data)
 	print(data.shape, fields)
 
 	#data = random_undersampler(data)
@@ -379,11 +382,15 @@ def main():
 
 	sess.run(tf.global_variables_initializer())
 
-	for l in range(10):
+	##
+	#prediction=tf.Graph().get_operation_by_name("prediction").outputs[0]
+	
+
+	for l in range(2):
 		#x_train_kf, x_test_kf = final_x_train[train_index], final_x_train[test_index]
 		#y_train_kf, y_test_kf = final_y_train[train_index], final_x_train[test_index]
 		#number of epochs
-		for i in range(20):
+		for i in range(10):
 
 			#Check strt
 			#xtrn, xtst, ytrn, ytst = train_test_split(x_train, y_train, test_size=0.2)
@@ -402,6 +409,9 @@ def main():
 
 		print("Test Accuracy: {}".format(test_acc))
 
+		predictions = output.eval(session=sess, feed_dict={inputs_: final_x_test})
+
+
 		train_acc = sess.run(accuracy, feed_dict={
 			inputs_: final_x_train,
 			targets_: label2bool(final_y_train)
@@ -412,6 +422,34 @@ def main():
 	print('Ones', ones)
 	print('Zeros', zeros)
 	print('negatives', negs)
+
+	print(predictions)
+	print(len(final_y_test))
+	print(final_y_test[0])
+	print(type(final_y_test[0]))
+	print(len(predictions))
+	print(np.argmax(predictions[0]))
+	print(np.argmax(predictions[1]))
+	print(np.argmax(predictions[2]))
+
+	pred = np.zeros(len(predictions))
+	for i in range(len(predictions)):
+		if(np.argmax(predictions[i])==0):
+			pred[i] = -1
+		elif(np.argmax(predictions[i])==1):
+			pred[i] = 0
+		elif(np.argmax(predictions[i])==2):
+			pred[i] = 1
+
+	score = 0
+	for i in range(len(predictions)):
+		if(pred[i]==int(final_y_test[i])):
+			score += 1
+	#print(pred[:10])
+	#print(final_y_test[:10])
+	print('accuracy=', score/len(predictions))
+
+	#print(sess.run(prediction,feed_dict={inputs_: final_x_train}))
 	# print(accuracy)
 
 if __name__  == "__main__":
