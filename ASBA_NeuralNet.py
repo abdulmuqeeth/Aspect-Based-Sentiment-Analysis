@@ -93,11 +93,12 @@ def filterData(allData):
 	print('in filtered data')
 
 	filteredData = np.copy(allData)
-	
+	print('************')
+	print(len(filteredData))
 	for i in range (len(allData)):
 
 		print(i)
-
+		print(filteredData[i])
 		text = filteredData[i][1]
 		
 		aspect_term = filteredData[i][2]
@@ -173,10 +174,13 @@ def label2bool(labels):
     for label in labels:
     	if label == '-1':
     		nn_labels.append([1,0,0])
-    	if label == '0':
+    	elif label == '0':
     		nn_labels.append([0,1,0])
-    	if label == '1':
+    	elif label == '1':
     		nn_labels.append([0,0,1])
+    	else:
+    		print('not valid label')
+    		print(label)
     return np.array(nn_labels)
  
 def get_batch(X, y, batch_size):
@@ -208,7 +212,7 @@ def main():
 	global a
 	global b
 	data = []
-	with open('data-1_train.csv') as csv_file:
+	with open('Sample_train1.csv') as csv_file:
 		csv_reader = csv.reader(csv_file, delimiter=',')
 		for row in csv_reader:
 			data.append(row)
@@ -217,6 +221,16 @@ def main():
 	np.random.shuffle(data)
 	print(data.shape, fields)
 
+
+
+	test_data = []
+	with open('Sample_test1.csv') as csv_file:
+		csv_reader = csv.reader(csv_file, delimiter=',')
+		for row in csv_reader:
+			test_data.append(row)
+	test_fields = test_data[0]
+	test_data = np.array(test_data[1:], dtype=object)
+
 	#data = random_undersampler(data)
 	
 
@@ -224,7 +238,9 @@ def main():
 	#words = filterData(data)
 
 	#******************#
-	words1 = filterData(data[:int(0.8*len(data))])
+	#words1 = filterData(data[:int(0.8*len(data))])
+	
+	words1 = filterData(data)
 	#print(words.shape)
 
 	print('$$$$$$$$$')
@@ -248,8 +264,11 @@ def main():
 	ones = final_y_train.count('1')
 	zeros = final_y_train.count('0')
 	negs = final_y_train.count('-1')
-		
-	words2 = filterData(data[int(0.8*len(data)):])
+	
+	print(len(test_data))
+	print(test_data[0])
+	print('$$$$$words2$$$$')
+	words2 = filterData(test_data)
 
 	print('2$$$$$$$$$')
 	print(len(a))
@@ -268,9 +287,9 @@ def main():
 		final_y_test.append(words2[i][4])
 
 
-	ones += final_y_test.count('1')
-	zeros += final_y_test.count('0')
-	negs += final_y_test.count('-1')
+	# ones += final_y_test.count('1')
+	# zeros += final_y_test.count('0')
+	# negs += final_y_test.count('-1')
 
 
 	# final_x_test = []
@@ -283,6 +302,13 @@ def main():
 	print(final_x_train[0].shape)
 	print(final_x_test[0].shape)
 	print('####')
+	print(len(final_x_train))
+	print(len(final_y_train))
+	print(len(final_x_test))
+	print(len(final_y_test))
+	print('^^^')
+
+
 
 	# words = filterData(data)
 
@@ -404,6 +430,15 @@ def main():
 					targets_: y_batch
 				})
 
+
+		print(len(final_x_test))
+		print(len(final_y_test))
+
+		for o in range(len(final_y_test)):
+			if(not(final_y_test[0]=='1' or final_y_test[0]=='-1' or final_y_test[0]=='0')):
+				print(o,' not found')
+
+		print(len(label2bool(final_y_test)))
 		test_acc = sess.run(accuracy, feed_dict={
 			inputs_: final_x_test,
 			targets_: label2bool(final_y_test)
@@ -460,7 +495,10 @@ def main():
 	# print(accuracy)
 	with open("output_data.txt", "w") as out_file:
 		for i in range(len(final_x_test_ids)):
-			out_file.write(str(final_x_test_ids[i])+ ";;" + str(int(pred[i])) + "\n")
+			if(i==len(final_x_test_ids)-1):
+				out_file.write(str(final_x_test_ids[i])+ ";;" + str(int(pred[i])))
+			else:
+				out_file.write(str(final_x_test_ids[i])+ ";;" + str(int(pred[i])) + "\n")
 
 if __name__  == "__main__":
 	main()

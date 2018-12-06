@@ -126,7 +126,8 @@ example_id, text, aspect_term, term_location, class
 2731_2,The first one sent: Touchpad didn't work The second sent: USB didn't work The third sent: Touchpad didn't work The fourth sent: Hasn't arrived yet.,Touchpad,90--98,-1
 2157_0,This computer is exceptionally thin for it's screen size and processing power.,screen size,45--56,1
 2167_0,There are no viruses or spyware to worry about like on a Windows computer.,Windows,57--64,-1
-1689_0,It is good to know that I can mobilize without having to worry about the battery life.,battery life,73--85,11933_1,I got it back again and was told the motherboard had been replaced[comma] so I was now on the SECOND motherboard within 3 months.,motherboard,95--106,-1
+1689_0,It is good to know that I can mobilize without having to worry about the battery life.,battery life,73--85,1
+1933_1,I got it back again and was told the motherboard had been replaced[comma] so I was now on the SECOND motherboard within 3 months.,motherboard,95--106,-1
 2617_0,It really is perfect for work and play.,play,34--38,1
 1686_0,Another thing I might add is the battery life is excellent.,battery life,33--45,1
 160_0,They offer the best warranty in the business[comma] and don't 3rd party it out like Toshiba.,warranty,20--28,1
@@ -196,7 +197,8 @@ example_id, text, aspect_term, term_location, class
 1962_0,It was heavy[comma]bulky[comma] and hard to carry because of the size.,size,53--57,-1
 2909_2,Have had many higher priced computers crash and burn long before ever got to use all that great memory and speed[comma] etc.,priced,21--27,-1
 671_2,This is a nicely sized laptop with lots of processing power and long battery life.,sized,17--22,1
-2778_0,The screen is a little glary[comma] and I hated the clicking buttons[comma] but I got used to them.,screen,4--10,-11966_0,It did not have all the features I expected it to have.,features,24--32,-1
+2778_0,The screen is a little glary[comma] and I hated the clicking buttons[comma] but I got used to them.,screen,4--10,-1
+1966_0,It did not have all the features I expected it to have.,features,24--32,-1
 2596_0,This system came loaded with Windows 7 Starter.,Windows 7 Starter,29--46,0
 2922_0,I have been very pleased with the performance of this laptop.,performance,34--45,1
 1126_1,The screen is framed by half- to a full-inch margin that is obviously unnecessary[comma] reduces the screen size and increases the bulk.,screen size,95--106,-1
@@ -346,5 +348,3 @@ example_id, text, aspect_term, term_location, class
 2086_1,My ONLY issues are: 1) the screen/video resolution won't increase to a higher resolution then 1024 x 60,resolution,78--88,-1
 1175_0,The laptop is relatively simple to use[comma] though I bought  Macs for Dummies[comma]  which is well worth $2,use,35--38,1
 23_1,The laptop is very lightweight[comma] can easily carry around in a knapsack full of text books and it barely adds any weight.,weight,112--118,1
-
-
