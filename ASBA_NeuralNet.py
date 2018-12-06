@@ -260,8 +260,10 @@ def main():
 
 
 	final_x_test =[]
+	final_x_test_ids = []
 	final_y_test =[]
 	for i in range(len(words2)):
+		final_x_test_ids.append(words2[i][0])
 		final_x_test.append(encode_onehot(words2[i][1], c))
 		final_y_test.append(words2[i][4])
 
@@ -419,6 +421,11 @@ def main():
 
 		print("Train Accuracy: {}".format(train_acc))
 
+	# tf.add(accuracy, accuracy, name='accuracy_nn')
+	# tf.add(output, output,  name='output_nn')
+	saver = tf.train.Saver()
+	saver.save(sess, "./nn_model")
+
 	print('Ones', ones)
 	print('Zeros', zeros)
 	print('negatives', negs)
@@ -451,6 +458,9 @@ def main():
 
 	#print(sess.run(prediction,feed_dict={inputs_: final_x_train}))
 	# print(accuracy)
+	with open("output_data.txt", "w") as out_file:
+		for i in range(len(final_x_test_ids)):
+			out_file.write(str(final_x_test_ids[i])+ ";;" + str(int(pred[i])) + "\n")
 
 if __name__  == "__main__":
 	main()
